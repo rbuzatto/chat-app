@@ -3,6 +3,7 @@ const http      = require('http');
 const express   = require('express');
 const socketIO  = require('socket.io');
 
+const {generateMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 
 const port = process.env.PORT || 3000;
@@ -18,22 +19,14 @@ io.on('connection', (socket) => {
 
     //criar 2 evts: socket.emit {from: Admin, text: Welcome to the chat app}
     //socket.broadcast.emit {from: Admin, text: New user joined}
-    socket.emit('newMessage', {
-        from: 'Admin', 
-        text: 'Welcome to the chat app'
-    });
+    socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
 
-    socket.broadcast.emit('newMessage', {
-        from: 'Admin', 
-        text: 'New user joined',
-        createdAt: new Date().getTime()
-    })
+    socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
     
     socket.on('createMessage', (newMessage) => {
         let {from, text} = newMessage;
-        let createdAt = new Date().getTime();
         //usamos io ao inves de socket pq io emite a todos conectados ao contrario de socket
-        io.emit('newMessage', {from, text, createdAt});
+        io.emit('newMessage', generateMessage(from, text));
 
         //ele emite para todos menos este socket que lança o broadcast
         // socket.broadcast.emit('newMessage', {from, text, createdAt});
