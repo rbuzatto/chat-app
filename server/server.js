@@ -15,6 +15,14 @@ app.use(express.static(publicPath));
 
 io.on('connection', (socket) => {
     console.log('New user is now connected');
+    
+    socket.on('createMessage', (newMessage) => {
+        let {from, text} = newMessage;
+        let createdAt = new Date().getTime();
+        //usamos io ao inves de socket pq io emite a todos conectados ao contrario de socket
+        io.emit('newMessage', {from, text, createdAt});
+
+    });
 
     socket.on('disconnect', () => {
         console.log('User got disconnected');
