@@ -11,22 +11,37 @@ socket.on('disconnect', function() {
 
 socket.on('newMessage', function(newMessage) {
     var formattedTime = moment(newMessage.createdAt).format('h:mm a');
-    var li = $('<li></li>');
-    li.text(`${newMessage.from} ${formattedTime}: ${newMessage.text}`);
+    // var li = $('<li></li>');
+    // li.text(`${newMessage.from} ${formattedTime}: ${newMessage.text}`);
 
-    $('#messages').append(li);
+    // $('#messages').append(li);
+
+    var template = $('#message-template').html(); //return a markup 
+    var html = Mustache.render(template, {
+        text: newMessage.text,
+        from: newMessage.from,
+        createdAt: formattedTime
+    });
+
+    $('#messages').append(html);
 });
 
 socket.on('newLocationMessage', function(locationObj) {
     var formattedTime = moment(locationObj.createdAt).format('h:mm a');
-    var li = $('<li></li>');
-    var a = $('<a target="_blank">My current location</a>');
+    // var li = $('<li></li>');
+    // var a = $('<a target="_blank">My current location</a>');
 
     // prevent html injection by using theses methods rather than adding into the string right away
-    li.text(locationObj.from + ': ' + formattedTime);
-    a.attr('href', locationObj.url);
-    li.append(a);
-    $('#messages').append(li);
+    // li.text(locationObj.from + ' ' + formattedTime + ': ');
+    // a.attr('href', locationObj.url);
+    var template = $('#location-message-template').html();
+    var html = Mustache.render(template, {
+        from: locationObj.from,
+        createdAt: formattedTime,
+        url: locationObj.url
+    });
+    // li.append(a);
+    $('#messages').append(html);
 });
 
 $('#message-form').on('submit', function(e) {
