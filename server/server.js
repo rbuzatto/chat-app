@@ -3,7 +3,7 @@ const http      = require('http');
 const express   = require('express');
 const socketIO  = require('socket.io');
 
-const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 
 const port = process.env.PORT || 3000;
@@ -23,14 +23,18 @@ io.on('connection', (socket) => {
 
     socket.broadcast.emit('newMessage', generateMessage('Admin', 'New user joined'));
     
-    socket.on('createMessage', (newMessage) => {
+    socket.on('createMessage', (newMessage, callback) => {
         let {from, text} = newMessage;
         //usamos io ao inves de socket pq io emite a todos conectados ao contrario de socket
         io.emit('newMessage', generateMessage(from, text));
-
+        callback();
         //ele emite para todos menos este socket que lança o broadcast
         // socket.broadcast.emit('newMessage', {from, text, createdAt});
 
+    });
+
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin',coords.latitude, coords.longitude));
     });
 
     socket.on('disconnect', () => {
