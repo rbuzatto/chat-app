@@ -10,19 +10,20 @@ socket.on('disconnect', function() {
 });
 
 socket.on('newMessage', function(newMessage) {
-    console.log('new message', newMessage);
+    var formattedTime = moment(newMessage.createdAt).format('h:mm a');
     var li = $('<li></li>');
-    li.text(`${newMessage.from}: ${newMessage.text}`);
+    li.text(`${newMessage.from} ${formattedTime}: ${newMessage.text}`);
 
     $('#messages').append(li);
 });
 
 socket.on('newLocationMessage', function(locationObj) {
+    var formattedTime = moment(locationObj.createdAt).format('h:mm a');
     var li = $('<li></li>');
     var a = $('<a target="_blank">My current location</a>');
 
     // prevent html injection by using theses methods rather than adding into the string right away
-    li.text(locationObj.from + ': ');
+    li.text(locationObj.from + ': ' + formattedTime);
     a.attr('href', locationObj.url);
     li.append(a);
     $('#messages').append(li);
